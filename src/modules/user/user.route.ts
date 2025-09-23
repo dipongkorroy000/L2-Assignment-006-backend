@@ -10,7 +10,7 @@ const router = Router();
 router.post("/register", validateRequest(createUserZodSchema), UserControllers.createUser);
 
 // anyone use
-router.get("/", authorize(...Object.values(Role)), UserControllers.getMe);
+router.get("/profile", authorize(...Object.values(Role)), UserControllers.getMe);
 
 // update by query(email) user profile
 router.patch("/", authorize(Role.sender, Role.receiver), UserControllers.updateProfile);

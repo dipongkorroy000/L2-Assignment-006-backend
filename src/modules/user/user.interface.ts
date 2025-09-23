@@ -31,6 +31,7 @@ export interface IUser {
   auths: IAuthProvider[];
   bookings?: Types.ObjectId[];
   guides?: Types.ObjectId[];
+  isVerified: boolean;
 }
 
 export interface UpdateUser {

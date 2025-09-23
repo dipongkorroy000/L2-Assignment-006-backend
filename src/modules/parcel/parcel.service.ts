@@ -17,16 +17,17 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
   session.startTransaction();
 
   try {
-    const { senderId, weight = 1, receiverId, ...rest } = payload;
+    const { senderId, weight = 1, receiverEmail, ...rest } = payload;
 
     const senderInfo = await User.findById(senderId);
     if (!senderInfo) throw new CustomError(status.NOT_FOUND, "User not found");
+    if (!senderInfo.isVerified) throw new CustomError(status.BAD_REQUEST, "Please verified your profile");
 
     if (!senderInfo.phone || !senderInfo.address)
       throw new CustomError(status.BAD_REQUEST, "Please Update Your Profile to Parcel Request And Must be add Phone & Address.");
 
-    if (receiverId) {
-      const receiver = await User.findById(receiverId);
+    if (receiverEmail) {
+      const receiver = await User.findOne({ email: receiverEmail });
       if (!receiver) throw new CustomError(401, "Receiver not found");
     }
 
@@ -39,7 +40,7 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
     await Payment.create([{ parcel: parcel[0]._id, transactionId: trackingId, amount: amount, status: PAYMENT_STATUS.UNPAID }], {
       session,
     });
-    
+
     const sslPayload: ISSLCommerz = {
       name: senderInfo.name,
       phoneNumber: senderInfo.phone as string,
@@ -95,12 +96,12 @@ const senderParcels = async (senderId: string) => {
 };
 
 const receiverIncomingParcel = async (receiverId: Types.ObjectId) => {
-  const parcels = await Parcel.find({ receiverId }).select("-_id -senderId -receiverId")
+  const parcels = await Parcel.find({ receiverId }).select("-_id -senderId -receiverId");
   return parcels;
 };
 
 const singleParcel = async (trackingId: string) => {
-  const result = await Parcel.findOne({ trackingId }).select("statusLog -_id title")
+  const result = await Parcel.findOne({ trackingId }).select("statusLog -_id title");
   return result;
 };
 
@@ -109,7 +110,7 @@ const confirmParcel = async (trackingId: string, phone: string | undefined, emai
   if (!parcel) throw new CustomError(401, "Parcel not found");
   if (parcel.payment !== Payment_Status.COMPLETE) throw new CustomError(status.BAD_REQUEST, "Payment must be completed");
 
-  if (email && parcel.receiverId) {
+  if (email && parcel.receiverEmail) {
     const receiver = await User.findOne({ email });
     if (!receiver) throw new CustomError(401, "Receiver not found");
 
@@ -120,8 +121,7 @@ const confirmParcel = async (trackingId: string, phone: string | undefined, emai
     if (!receiver) throw new CustomError(401, "User Not Found");
     if (!receiver.phone) throw new CustomError(401, "Please update your profile , must be add phone number");
 
-    if (receiver._id.toString() !== parcel.receiverId.toString())
-      throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valied this receiver");
+    if (receiver.email !== parcel.receiverEmail) throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valied this receiver");
 
     const result = await Parcel.updateOne({ trackingId }, { status: Status.picked });
 

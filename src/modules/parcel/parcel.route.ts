@@ -8,7 +8,7 @@ import { createParcelSchema } from "./parcel.validation";
 const route = Router();
 
 // parcel delivery request(create) by receiver or admin
-route.post("/", validateRequest(createParcelSchema), authorize(Role.admin, Role.sender), parcelController.parcelRequest);
+route.post("/create-parcel", validateRequest(createParcelSchema), authorize(Role.admin, Role.sender), parcelController.parcelRequest);
 
 // all parcels get by admin
 route.get("/all-parcel", authorize(Role.admin, Role.super_admin), parcelController.allParcels);

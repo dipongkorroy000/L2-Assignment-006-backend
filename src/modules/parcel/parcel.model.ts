@@ -15,7 +15,7 @@ const statusLogSchema = new Schema<StatusLog>(
 const parcelSchema = new Schema<IParcel>(
   {
     senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    receiverId: { type: Schema.Types.ObjectId, ref: "User" },
+    receiverEmail: { type: Schema.Types.ObjectId, ref: "User" },
     receiverNumber: { type: String, required: true },
     title: { type: String, required: [true, "Please provide parcel title"] },
     type: { type: String, required: [true, "Please specify parcel type"] },

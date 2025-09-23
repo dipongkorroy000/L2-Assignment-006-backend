@@ -4,7 +4,7 @@ import { OTPController } from "./otp.controller";
 
 const router = express.Router();
 
-router.post("/send", OTPController.sendOTP);
-router.post("/verify", OTPController.verifyOTP);
+router.post("/otp-send", OTPController.sendOTP);
+router.post("/otp-verify", OTPController.verifyOTP);
 
-export const OtpRoutes = router;
+export const VerificationRoutes = router;

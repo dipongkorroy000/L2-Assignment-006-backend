@@ -50,7 +50,7 @@ export interface IParcel {
   division: string;
   city: string;
   area: string;
-  receiverId?: Types.ObjectId;
+  receiverEmail?: string;
   receiverNumber: string;
   status: Status;
   payment: Payment_Status;

@@ -21,12 +21,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
-  const email = req.query.email;
-  const user = await User.findOne({ email });
-  if (!user) throw new CustomError(status.NOT_FOUND, "Not authorized");
-
-  const token = req.token;
-  if (token.userId.toString() !== user._id.toString()) throw new CustomError(status.NOT_FOUND, "Not authorized");
+  const { email } = req.token;
 
   const result = await UserService.getMe(email as string);
 
