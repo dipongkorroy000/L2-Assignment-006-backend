@@ -11,6 +11,7 @@ import { User } from "../modules/user/user.model";
 import { uploadBufferToCloudinary } from "../config/cloudinary.config";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
 import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
+import { QueryBuilder } from "../utils/QueryBuilder";
 
 const successPayment = async (query: Record<string, string>) => {
   const session = await Parcel.startSession();
@@ -75,11 +76,7 @@ const failPayment = async (query: Record<string, string>) => {
   session.startTransaction();
 
   try {
-    const updatedPayment = await Payment.findOneAndUpdate(
-      { transactionId: query.transactionId },
-      { status: PAYMENT_STATUS.FAILED },
-      { session }
-    );
+    const updatedPayment = await Payment.findOneAndUpdate({ transactionId: query.transactionId }, { status: PAYMENT_STATUS.FAILED }, { session });
 
     await Parcel.findOneAndUpdate(
       { trackingId: updatedPayment?.transactionId },
@@ -109,11 +106,7 @@ const cancelPayment = async (query: Record<string, string>) => {
   session.startTransaction();
 
   try {
-    const updatedPayment = await Payment.findOneAndUpdate(
-      { transactionId: query.transactionId },
-      { status: PAYMENT_STATUS.CANCEL },
-      { session }
-    );
+    const updatedPayment = await Payment.findOneAndUpdate({ transactionId: query.transactionId }, { status: PAYMENT_STATUS.CANCEL }, { session });
 
     await Parcel.findOneAndUpdate(
       { trackingId: updatedPayment?.transactionId },
@@ -162,9 +155,13 @@ const nextTimePayment = async (trackingId: string) => {
   return { paymentUrl: sslPayment.GatewayPageURL };
 };
 
-const getPayments = async () => {
-  const payments = await Payment.find();
-  return payments;
+const getPayments = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(Payment.find(), query);
+
+  const payments = await queryBuilder.search(["transactionId", "status"]).filter().sort().fields().paginate()
+
+  const [data, meta] = await Promise.all([payments.build(), queryBuilder.getMeta()]);
+  return { data, meta };
 };
 
 export const PaymentService = {

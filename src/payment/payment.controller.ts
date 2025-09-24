@@ -61,13 +61,15 @@ const validatePayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getPayments = catchAsync(async (req: Request, res: Response) => {
+  const query = await req.query;
   const token = await req.token;
-  const user = await User.findById(token.userId);
 
+  const user = await User.findById(token.userId);
   if (!user) throw new CustomError(401, "User not found");
 
   if (user.role === Role.admin || user.role === Role.super_admin) {
-    const payments = await PaymentService.getPayments();
+    const payments = await PaymentService.getPayments(query as Record<string, string>);
+
     sendResponse(res, { success: true, status: 200, message: "all payments", data: payments });
     return;
   } else {
