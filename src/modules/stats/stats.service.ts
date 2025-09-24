@@ -61,14 +61,17 @@ const parcelStats = async () => {
     {
       $project: {
         lastStatus: {
-          $arrayElemAt: ["$statusLog.status", -1], // Get last status from statusLog
+          $ifNull: [
+            { $arrayElemAt: ["$statusLog.status", -1] },
+            "N/A", // fallback if null
+          ],
         },
       },
     },
     {
       $group: {
-        _id: "$lastStatus", // Group by last status
-        count: { $sum: 1 }, // Count how many parcels have that last status
+        _id: "$lastStatus",
+        count: { $sum: 1 },
       },
     },
     {
@@ -85,6 +88,8 @@ const parcelStats = async () => {
     totalParcelByStatusPromise,
     statusLogEachStatusCountPromise,
   ]);
+
+  // console.log(totalParcel, totalParcelByStatus, statusLogEachStatusCount)
 
   return { totalParcel, totalParcelByStatus, statusLogEachStatusCount };
 };

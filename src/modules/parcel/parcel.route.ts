@@ -29,8 +29,8 @@ route.get("/anyOne/:trackingId", parcelController.singleParcel);
 route.delete("/:trackingId", authorize(Role.admin, Role.super_admin), parcelController.deleteParcel);
 
 // parcel statusLog(approved, dispatched, in-transit, delivered) update by admin
-route.patch("/:parcelId", authorize(Role.admin, Role.super_admin), parcelController.parcelStatusUpdate);
+route.patch("/:trackingId", authorize(Role.admin, Role.super_admin), parcelController.parcelStatusUpdate);
 
-// ---- parcel cancel by sender -> otp functionality 
+// ---- parcel cancel by sender -> otp functionality
 
-export const ParcelRoute = route; 
+export const ParcelRoute = route;

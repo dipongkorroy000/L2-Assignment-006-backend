@@ -17,13 +17,14 @@ const parcelRequest = catchAsync(async (req: Request, res: Response) => {
 
 const parcelStatusUpdate = catchAsync(async (req: Request, res: Response) => {
   const token = req.token;
-  const parcelId = req.params.parcelId;
+  const trackingId = req.params.trackingId;
   const payload = await req.body;
+
   const admin = await User.findOne({ email: token.email });
   if (!admin) throw new CustomError(status.BAD_REQUEST, "User Not Found");
   if (token.role !== admin.role) throw new CustomError(status.UNAUTHORIZED, "Unauthorized user");
 
-  const result = await parcelService.parcelStatusUpdate(admin.name, parcelId, payload);
+  const result = await parcelService.parcelStatusUpdate(admin.name, trackingId, payload);
 
   sendResponse(res, { status: status.OK, success: true, message: "Parcel Updated Successfully", data: result });
   // -----

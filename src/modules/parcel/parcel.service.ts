@@ -67,14 +67,18 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
   // return parcel;
 };
 
-const parcelStatusUpdate = async (adminName: string, parcelId: string, payload: TParcelStatusLog) => {
+const parcelStatusUpdate = async (adminName: string, trackingId: string, payload: TParcelStatusLog) => {
   if (!payload.location || !payload.note || !payload.status) {
     throw new CustomError(status.BAD_REQUEST, "More Data Needed");
   }
 
-  const parcel = await Parcel.findById(parcelId);
-  if (!parcel) {
-    throw new CustomError(status.BAD_REQUEST, "Parcel Not Found");
+  const parcel = await Parcel.findOne({ trackingId });
+
+  if (!parcel) throw new CustomError(status.BAD_REQUEST, "Parcel Not Found");
+
+  if (parcel.statusLog && parcel.statusLog.length > 0) {
+    const status = parcel?.statusLog[parcel?.statusLog.length - 1].status;
+    if(status === payload.status) throw new CustomError(401, `Already this parcel status ${status}`)
   }
 
   const statusLog: StatusLog = {
@@ -147,7 +151,7 @@ const deleteParcel = async (trackingId: string) => {
 const allParcels = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(Parcel.find(), query);
 
-  const parcels = await queryBuilder.search(["type", "division", "city"]).filter().sort().fields().paginate();
+  const parcels = await queryBuilder.search(["division", "trackingId", "status", "payment"]).filter().sort().fields().paginate();
 
   const [data, meta] = await Promise.all([parcels.build(), queryBuilder.getMeta()]);
   return { data, meta };
