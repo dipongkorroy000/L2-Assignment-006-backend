@@ -49,12 +49,8 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const token = req.token;
-  const admin = await User.findOne({ email: token.email });
-  if (!admin) throw new CustomError(status.NOT_FOUND, "Not authorized");
-  if (token.userId.toString() !== admin._id.toString()) throw new CustomError(status.NOT_FOUND, "Not authorized");
-
-  const result = await UserService.getAllUsers(token.userId);
+  const query = await req.query;
+  const result = await UserService.getAllUsers(query as Record<string, string>);
 
   sendResponse(res, {
     success: true,

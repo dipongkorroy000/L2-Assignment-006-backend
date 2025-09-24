@@ -11,6 +11,8 @@ import { SSLService } from "../../sslCommerz/sslCommerz.service";
 import { Payment } from "../../payment/payment.model";
 import { PAYMENT_STATUS } from "../../payment/payment.interface";
 import { Types } from "mongoose";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import { strike } from "pdfkit/js/mixins/annotations";
 
 const parcelRequest = async (payload: Partial<IParcel>) => {
   const session = await Parcel.startSession();
@@ -142,9 +144,13 @@ const deleteParcel = async (trackingId: string) => {
   return result;
 };
 
-const allParcels = async () => {
-  const parcels = await Parcel.find();
-  return parcels;
+const allParcels = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(Parcel.find(), query);
+
+  const parcels = await queryBuilder.search(["type", "division", "city"]).filter().sort().fields().paginate();
+
+  const [data, meta] = await Promise.all([parcels.build(), queryBuilder.getMeta()]);
+  return { data, meta };
 };
 
 export const parcelService = {

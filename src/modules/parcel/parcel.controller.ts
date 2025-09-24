@@ -65,12 +65,13 @@ const confirmParcel = catchAsync(async (req: Request, res: Response) => {
 });
 
 const allParcels = catchAsync(async (req: Request, res: Response) => {
+  const query = await req.query;
   const token = req.token;
   const admin = await User.findOne({ email: token.email });
   if (!admin) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
   if (token.userId.toString() !== admin._id.toString()) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
 
-  const result = await parcelService.allParcels();
+  const result = await parcelService.allParcels(query as Record<string, string>);
   sendResponse(res, { status: status.OK, success: true, message: "All Parcels retrieved successfuly", data: result });
 });
 

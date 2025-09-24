@@ -4,7 +4,7 @@ import status from "http-status-codes";
 import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
 import { IAuthProvider, IUser, Role, UpdateUser } from "./user.interface";
-import { Types } from "mongoose";
+import { QueryBuilder } from "../../utils/QueryBuilder";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, role, ...rest } = payload;
@@ -39,12 +39,15 @@ const updateProfile = async (email: string, payload: UpdateUser) => {
   return updateUser;
 };
 
-const getAllUsers = async (userId: string) => {
-  const users = await User.find({ _id: { $ne: new Types.ObjectId(userId) } }).select("-password");
+const getAllUsers = async (query: Record<string, string>) => {
+  const queryBuilder = new QueryBuilder(User.find(), query);
 
-  const totalUsers = await User.countDocuments({ _id: { $ne: new Types.ObjectId(userId) } });
+  const users = await queryBuilder.search(["email", "phone", "role"]).filter().sort().fields().paginate();
 
-  return { data: users, meta: { total: totalUsers } };
+  const [data, meta] = await Promise.all([users.build(), queryBuilder.getMeta()]);
+  return { data, meta };
+
+  // return { data: users, meta: { total: totalUsers } };
 };
 
 const updateUserRole = async (email: string, role: Role) => {

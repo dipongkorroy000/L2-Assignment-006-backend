@@ -12,8 +12,6 @@ export const superAdmin = async () => {
       return;
     }
 
-    console.log("Trying to create Super Admin...");
-
     const hashedPassword = await bcryptjs.hash(envVars.SUPER_ADMIN_PASSWORD, Number(envVars.BCRYPT_SALT_ROUND));
 
     const authProvider: IAuthProvider = {
@@ -27,11 +25,11 @@ export const superAdmin = async () => {
       email: envVars.SUPER_ADMIN_EMAIL,
       password: hashedPassword,
       auths: [authProvider],
+      isVerified: true,
     };
 
-    const superadmin = await User.create(payload);
-    console.log("Super Admin Created Successfuly! \n");
-    console.log(superadmin);
+    const superAdmin = await User.create(payload);
+    console.log("Super Admin Created Successfuly! \n", superAdmin);
   } catch (error) {
     console.log(error);
   }
