@@ -23,4 +23,6 @@ router.get("/all-users", authorize(Role.admin, Role.super_admin), UserController
 // and admin can make admin & sender & receiver
 router.patch("/updateUserRole", authorize(Role.admin, Role.super_admin), UserControllers.updateUserRole);
 
+router.delete("/delete", authorize(Role.admin, Role.super_admin), UserControllers.deleteUser);
+
 export const UserRoute = router;

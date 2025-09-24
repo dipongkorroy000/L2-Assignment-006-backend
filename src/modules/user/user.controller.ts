@@ -79,10 +79,18 @@ const updateUserRole = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const email = await req.body.email;
+  const result = await UserService.deleteUser(email);
+
+  sendResponse(res, { success: true, status: status.OK, message: "Deleted User", data: result });
+});
+
 export const UserControllers = {
   createUser,
   getMe,
   updateProfile,
   getAllUsers,
   updateUserRole,
+  deleteUser,
 };

@@ -53,10 +53,22 @@ const getAllUsers = async (query: Record<string, string>) => {
 const updateUserRole = async (email: string, role: Role) => {
   const user = await User.findOne({ email });
   if (!user) throw new CustomError(401, "User not found");
+  if (user.role === role) throw new CustomError(401, `Already role is ${role}`);
 
   const updateRole = await User.findByIdAndUpdate(user._id, { role });
 
   return updateRole;
 };
 
-export const UserService = { createUser, getMe, updateProfile, getAllUsers, updateUserRole };
+const deleteUser = async (email: string) => {
+  const find = await User.findOne({ email });
+
+  if (!find) throw new CustomError(status.BAD_REQUEST, "User Not Find");
+  if (find.isDeleted) throw new CustomError(status.BAD_REQUEST, "Already Deleted");
+
+  const result = await User.findOneAndUpdate({ email }, { $set: { isDeleted: true } }).select("email -_id");
+
+  return result;
+};
+
+export const UserService = { createUser, getMe, updateProfile, getAllUsers, updateUserRole, deleteUser };
