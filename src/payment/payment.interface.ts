@@ -61,4 +61,5 @@ export interface IPayment {
   paymentGatewayData?: any;
   invoiceUrl?: string;
   createdAt?: Date;
+  userId?: Types.ObjectId;
 }

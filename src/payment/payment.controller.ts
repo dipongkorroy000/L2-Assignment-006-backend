@@ -76,6 +76,13 @@ const getPayments = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, { success: true, status: 400, message: "not authorized", data: null });
   }
 });
+const userPayments = catchAsync(async (req: Request, res: Response) => {
+  const userId = await req.token.userId;
+
+  const payments = await PaymentService.userPayments(userId);
+
+  sendResponse(res, { success: true, status: 200, message: "Payments get successfully", data: payments });
+});
 
 export const PaymentController = {
   successPayment,
@@ -84,4 +91,5 @@ export const PaymentController = {
   nextTimePayment,
   validatePayment,
   getPayments,
+  userPayments,
 };

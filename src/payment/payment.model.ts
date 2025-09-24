@@ -10,6 +10,7 @@ const paymentSchema = new Schema<IPayment>(
     paymentGatewayData: { type: Object },
     invoiceUrl: { type: String },
     createdAt: { type: Date },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   {
     timestamps: true,

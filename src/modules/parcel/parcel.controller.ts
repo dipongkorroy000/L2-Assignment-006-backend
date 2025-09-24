@@ -36,9 +36,9 @@ const deleteParcel = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, { status: status.OK, success: true, message: "Delete the parcel", data: result });
 });
 
-const senderParcels = catchAsync(async (req: Request, res: Response) => {
-  const senderId = req.params.senderId;
-  const result = await parcelService.senderParcels(senderId);
+const myParcels = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.token.userId;
+  const result = await parcelService.myParcels(userId);
   sendResponse(res, { status: status.OK, success: true, message: "My Parcels retrieved successfully", data: result });
 });
 
@@ -79,7 +79,7 @@ const allParcels = catchAsync(async (req: Request, res: Response) => {
 export const parcelController = {
   parcelRequest,
   parcelStatusUpdate,
-  senderParcels,
+  myParcels,
   deleteParcel,
   allParcels,
   receiverIncomingParcel,

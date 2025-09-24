@@ -158,10 +158,15 @@ const nextTimePayment = async (trackingId: string) => {
 const getPayments = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(Payment.find(), query);
 
-  const payments = await queryBuilder.search(["transactionId", "status"]).filter().sort().fields().paginate()
+  const payments = await queryBuilder.search(["transactionId", "status"]).filter().sort().fields().paginate();
 
   const [data, meta] = await Promise.all([payments.build(), queryBuilder.getMeta()]);
   return { data, meta };
+};
+
+const userPayments = async (userId: string) => {
+  const payments = await Payment.find({ userId });
+  return payments;
 };
 
 export const PaymentService = {
@@ -170,4 +175,5 @@ export const PaymentService = {
   cancelPayment,
   nextTimePayment,
   getPayments,
+  userPayments,
 };

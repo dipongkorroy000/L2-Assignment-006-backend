@@ -13,6 +13,8 @@ router.post("/init-payment/:trackingId", PaymentController.nextTimePayment);
 
 router.post("/validate-payment", PaymentController.validatePayment);
 
-router.get("/all-payments", authorize(Role.admin, Role.super_admin), PaymentController.getPayments)
+router.get("/all-payments", authorize(Role.admin, Role.super_admin), PaymentController.getPayments);
+
+router.get("/my-payments", authorize(...Object.values(Role)), PaymentController.userPayments);
 
 export const PaymentRoutes = router;

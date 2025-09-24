@@ -20,7 +20,7 @@ route.patch("/confirm", parcelController.confirmParcel);
 route.get("/receiver", authorize(Role.receiver), parcelController.receiverIncomingParcel);
 
 // all delivery request parcels get by admin or sender
-route.get("/myParcels/:senderId", authorize(Role.admin, Role.sender), parcelController.senderParcels);
+route.get("/myParcels", authorize(Role.admin, Role.sender), parcelController.myParcels);
 
 // single incoming parcel get anyone with trackingId -> see parcel statusLog & title
 route.get("/anyOne/:trackingId", parcelController.singleParcel);

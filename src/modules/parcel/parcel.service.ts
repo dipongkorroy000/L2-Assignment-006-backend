@@ -12,7 +12,6 @@ import { Payment } from "../../payment/payment.model";
 import { PAYMENT_STATUS } from "../../payment/payment.interface";
 import { Types } from "mongoose";
 import { QueryBuilder } from "../../utils/QueryBuilder";
-import { strike } from "pdfkit/js/mixins/annotations";
 
 const parcelRequest = async (payload: Partial<IParcel>) => {
   const session = await Parcel.startSession();
@@ -39,7 +38,7 @@ const parcelRequest = async (payload: Partial<IParcel>) => {
 
     const amount = 100 * weight;
 
-    await Payment.create([{ parcel: parcel[0]._id, transactionId: trackingId, amount: amount, status: PAYMENT_STATUS.UNPAID }], {
+    await Payment.create([{ parcel: parcel[0]._id, transactionId: trackingId, amount: amount, status: PAYMENT_STATUS.UNPAID, userId: senderId }], {
       session,
     });
 
@@ -78,7 +77,7 @@ const parcelStatusUpdate = async (adminName: string, trackingId: string, payload
 
   if (parcel.statusLog && parcel.statusLog.length > 0) {
     const status = parcel?.statusLog[parcel?.statusLog.length - 1].status;
-    if(status === payload.status) throw new CustomError(401, `Already this parcel status ${status}`)
+    if (status === payload.status) throw new CustomError(401, `Already this parcel status ${status}`);
   }
 
   const statusLog: StatusLog = {
@@ -96,8 +95,8 @@ const parcelStatusUpdate = async (adminName: string, trackingId: string, payload
   return updatedParcel;
 };
 
-const senderParcels = async (senderId: string) => {
-  const parcels = await Parcel.find({ senderId });
+const myParcels = async (userId: string) => {
+  const parcels = await Parcel.find({ senderId: userId });
   return parcels;
 };
 
@@ -160,7 +159,7 @@ const allParcels = async (query: Record<string, string>) => {
 export const parcelService = {
   parcelRequest,
   parcelStatusUpdate,
-  senderParcels,
+  myParcels,
   deleteParcel,
   allParcels,
   singleParcel,

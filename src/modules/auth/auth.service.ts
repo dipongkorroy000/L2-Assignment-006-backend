@@ -14,6 +14,8 @@ const credentialLogin = async (payload: Partial<IUser>, res: Response) => {
   const isUserExist = await User.findOne({ email });
   if (!isUserExist) throw new CustomError(httpStatus.BAD_REQUEST, "Email does not exist");
 
+  if (isUserExist.isDeleted) throw new CustomError(httpStatus.BAD_REQUEST, "Email id Deleted");
+
   const isPasswordMatched = await bcrypt.compare(password as string, isUserExist.password as string);
   if (!isPasswordMatched) throw new CustomError(httpStatus.BAD_REQUEST, "Incorrect Password");
 
