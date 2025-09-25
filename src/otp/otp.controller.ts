@@ -4,7 +4,7 @@ import { sendResponse } from "../utils/sendResponse";
 import { catchAsync } from "../utils/catchAsync";
 
 const sendOTP = catchAsync(async (req: Request, res: Response) => {
-  const { trackingId } = req.body;
+  const { trackingId } = await req.body;
 
   await OTPService.sendOTP(trackingId);
 

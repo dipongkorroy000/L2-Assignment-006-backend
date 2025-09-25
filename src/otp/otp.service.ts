@@ -16,12 +16,12 @@ const generateOtp = (length = 6) => {
 
 const sendOTP = async (trackingId: string) => {
   const otp = generateOtp();
+  const parcel = await Parcel.findOne({ trackingId });
 
-  const parcel = await Parcel.findOne({ trackingId: trackingId });
   if (!parcel) throw new CustomError(401, "Parcel not found");
 
   if ((parcel.statusLog as object[]).length > 1) {
-    const obj = (parcel.statusLog as object[])[(parcel.statusLog as object[]).length - 1] as Partial<TParcelStatusLog>
+    const obj = (parcel.statusLog as object[])[(parcel.statusLog as object[]).length - 1] as Partial<TParcelStatusLog>;
     throw new CustomError(400, `The Parcel has been ${obj.status}`);
   }
 
@@ -51,10 +51,7 @@ const verifyOTP = async (trackingId: string, otp: string) => {
   if (!savedOtp) throw new CustomError(401, "Invalid OTP");
   if (savedOtp !== otp) throw new CustomError(401, "Invalid OTP");
 
-  await Promise.all([
-    await Parcel.updateOne({ trackingId }, { status: Status.cancel }, { runValidators: true }),
-    await redisClient.del([redisKey]),
-  ]);
+  await Promise.all([await Parcel.updateOne({ trackingId }, { status: Status.cancel }, { runValidators: true }), await redisClient.del([redisKey])]);
 };
 
 export const OTPService = { sendOTP, verifyOTP };
