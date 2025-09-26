@@ -17,7 +17,7 @@ const sendOTP = catchAsync(async (req: Request, res: Response) => {
 });
 
 const verifyOTP = catchAsync(async (req: Request, res: Response) => {
-  const { trackingId, otp } = req.body;
+  const { trackingId, otp } =  await req.body;
 
   await OTPService.verifyOTP(trackingId, otp);
 

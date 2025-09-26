@@ -8,7 +8,7 @@ import { User } from "./user.model";
 import { Role } from "./user.interface";
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
-  const payload = req.body;
+  const payload = await req.body;
 
   const result = await UserService.createUser(payload);
 
@@ -21,7 +21,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
-  const { email } = req.token;
+  const { email } = await req.token;
 
   const result = await UserService.getMe(email as string);
 

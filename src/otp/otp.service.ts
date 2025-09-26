@@ -16,7 +16,8 @@ const generateOtp = (length = 6) => {
 
 const sendOTP = async (trackingId: string) => {
   const otp = generateOtp();
-  const parcel = await Parcel.findOne({ trackingId });
+
+  const parcel = await Parcel.findOne({trackingId: trackingId });
 
   if (!parcel) throw new CustomError(401, "Parcel not found");
 
