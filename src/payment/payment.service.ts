@@ -155,6 +155,34 @@ const nextTimePayment = async (trackingId: string) => {
   return { paymentUrl: sslPayment.GatewayPageURL };
 };
 
+const nextTimePaymentReceiver = async (trackingId: string, userId: string) => {
+  const parcel = await Parcel.findOne({ trackingId });
+  if (!parcel) throw new CustomError(httpStatus.NOT_FOUND, "Parcel Not Found. You have not parcel any payment");
+
+  
+  const receiver = await User.findById(userId);
+  if (!receiver) throw new CustomError(401, "User not found");
+
+  const payment = await Payment.findOne({ transactionId: trackingId });
+  if (!payment) throw new CustomError(401, "Payment not found");
+
+  if (payment.status === PAYMENT_STATUS.PAID && parcel.payment === Payment_Status.COMPLETE)
+    throw new CustomError(httpStatus.BAD_REQUEST, "Delivery Charge already paid");
+
+  const sslPayload: ISSLCommerz = {
+    address: receiver.address,
+    email: receiver.email,
+    phoneNumber: receiver.phone as string,
+    name: receiver.name,
+    amount: payment.amount,
+    transactionId: payment.transactionId,
+  };
+
+  const sslPayment = await SSLService.sslPaymentInit(sslPayload);
+
+  return { paymentUrl: sslPayment.GatewayPageURL };
+};
+
 const getPayments = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(Payment.find(), query);
 
@@ -176,4 +204,5 @@ export const PaymentService = {
   nextTimePayment,
   getPayments,
   userPayments,
+  nextTimePaymentReceiver,
 };

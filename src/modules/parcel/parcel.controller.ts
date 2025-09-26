@@ -48,7 +48,7 @@ const receiverIncomingParcel = catchAsync(async (req: Request, res: Response) =>
   if (!user) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
   if (token.userId.toString() !== user._id.toString()) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
 
-  const result = await parcelService.receiverIncomingParcel(user._id);
+  const result = await parcelService.receiverIncomingParcel(user.email);
 
   sendResponse(res, { status: status.OK, success: true, data: result, message: "incoming parcel retrieved successfully" });
 });

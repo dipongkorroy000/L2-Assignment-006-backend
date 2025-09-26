@@ -3,7 +3,6 @@ import { Payment_Status, Status } from "./parcel.interface";
 
 export const createParcelSchema = z.object({
   senderId: z.string().min(1, "Sender ID is required"),
-  receiverId: z.string().optional(),
   title: z.string().min(1, "Parcel title is required"),
   type: z.string().min(1, "Parcel type is required"),
   weight: z.number().min(1, "Weight must be positive").default(1),
@@ -15,4 +14,5 @@ export const createParcelSchema = z.object({
   payment: z.enum([Payment_Status.PENDING]).optional(),
   statusLog: z.array(z.string()).optional(),
   receiverNumber: z.string(),
+  receiverEmail: z.email().optional(),
 });

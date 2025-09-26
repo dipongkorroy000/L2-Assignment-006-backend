@@ -49,6 +49,13 @@ const nextTimePayment = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, { status: 201, success: true, message: "Payment done successfully", data: result });
 });
 
+const nextTimePaymentReceiver = catchAsync(async (req: Request, res: Response) => {
+  const userId = await req.token;
+  const trackingId = req.params.trackingId;
+  const result = await PaymentService.nextTimePaymentReceiver(trackingId, userId);
+  sendResponse(res, { status: 201, success: true, message: "Payment done successfully", data: result });
+});
+
 const validatePayment = catchAsync(async (req: Request, res: Response) => {
   await SSLService.validatePayment(req.body);
 
@@ -76,6 +83,7 @@ const getPayments = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, { success: true, status: 400, message: "not authorized", data: null });
   }
 });
+
 const userPayments = catchAsync(async (req: Request, res: Response) => {
   const userId = await req.token.userId;
 
@@ -92,4 +100,5 @@ export const PaymentController = {
   validatePayment,
   getPayments,
   userPayments,
+  nextTimePaymentReceiver
 };
