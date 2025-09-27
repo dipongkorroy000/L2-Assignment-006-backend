@@ -44,15 +44,9 @@ const cancelPayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const nextTimePayment = catchAsync(async (req: Request, res: Response) => {
-  const trackingId = req.params.trackingId;
-  const result = await PaymentService.nextTimePayment(trackingId);
-  sendResponse(res, { status: 201, success: true, message: "Payment done successfully", data: result });
-});
-
-const nextTimePaymentReceiver = catchAsync(async (req: Request, res: Response) => {
-  const userId = await req.token;
-  const trackingId = req.params.trackingId;
-  const result = await PaymentService.nextTimePaymentReceiver(trackingId, userId);
+  const token = await req.token;
+  const trackingId = await req.params.trackingId;
+  const result = await PaymentService.nextTimePayment(trackingId, token);
   sendResponse(res, { status: 201, success: true, message: "Payment done successfully", data: result });
 });
 
@@ -100,5 +94,4 @@ export const PaymentController = {
   validatePayment,
   getPayments,
   userPayments,
-  nextTimePaymentReceiver
 };

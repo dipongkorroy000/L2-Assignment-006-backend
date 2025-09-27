@@ -12,6 +12,7 @@ import { uploadBufferToCloudinary } from "../config/cloudinary.config";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
 import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
 import { QueryBuilder } from "../utils/QueryBuilder";
+import { JwtPayload } from "jsonwebtoken";
 
 const successPayment = async (query: Record<string, string>) => {
   const session = await Parcel.startSession();
@@ -128,12 +129,13 @@ const cancelPayment = async (query: Record<string, string>) => {
   }
 };
 
-const nextTimePayment = async (trackingId: string) => {
+const nextTimePayment = async (trackingId: string, token: JwtPayload) => {
   const parcel = await Parcel.findOne({ trackingId });
   if (!parcel) throw new CustomError(httpStatus.NOT_FOUND, "Parcel Not Found. You have not parcel any payment");
 
-  const sender = await User.findById(parcel.senderId);
-  if (!sender) throw new CustomError(401, "User not found");
+  const userId = await token.userId;
+  const user = await User.findById(userId);
+  if (!user) throw new CustomError(401, "User not found");
 
   const payment = await Payment.findOne({ transactionId: trackingId });
   if (!payment) throw new CustomError(401, "Payment not found");
@@ -142,10 +144,10 @@ const nextTimePayment = async (trackingId: string) => {
     throw new CustomError(httpStatus.BAD_REQUEST, "Delivery Charge already paid");
 
   const sslPayload: ISSLCommerz = {
-    address: sender.address,
-    email: sender.email,
-    phoneNumber: sender.phone as string,
-    name: sender.name,
+    address: user.address,
+    email: user.email,
+    phoneNumber: user.phone as string,
+    name: user.name,
     amount: payment.amount,
     transactionId: payment.transactionId,
   };
@@ -155,33 +157,6 @@ const nextTimePayment = async (trackingId: string) => {
   return { paymentUrl: sslPayment.GatewayPageURL };
 };
 
-const nextTimePaymentReceiver = async (trackingId: string, userId: string) => {
-  const parcel = await Parcel.findOne({ trackingId });
-  if (!parcel) throw new CustomError(httpStatus.NOT_FOUND, "Parcel Not Found. You have not parcel any payment");
-
-  
-  const receiver = await User.findById(userId);
-  if (!receiver) throw new CustomError(401, "User not found");
-
-  const payment = await Payment.findOne({ transactionId: trackingId });
-  if (!payment) throw new CustomError(401, "Payment not found");
-
-  if (payment.status === PAYMENT_STATUS.PAID && parcel.payment === Payment_Status.COMPLETE)
-    throw new CustomError(httpStatus.BAD_REQUEST, "Delivery Charge already paid");
-
-  const sslPayload: ISSLCommerz = {
-    address: receiver.address,
-    email: receiver.email,
-    phoneNumber: receiver.phone as string,
-    name: receiver.name,
-    amount: payment.amount,
-    transactionId: payment.transactionId,
-  };
-
-  const sslPayment = await SSLService.sslPaymentInit(sslPayload);
-
-  return { paymentUrl: sslPayment.GatewayPageURL };
-};
 
 const getPayments = async (query: Record<string, string>) => {
   const queryBuilder = new QueryBuilder(Payment.find(), query);
@@ -204,5 +179,4 @@ export const PaymentService = {
   nextTimePayment,
   getPayments,
   userPayments,
-  nextTimePaymentReceiver,
 };

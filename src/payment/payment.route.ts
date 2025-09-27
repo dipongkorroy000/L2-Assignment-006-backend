@@ -9,9 +9,7 @@ router.post("/success", PaymentController.successPayment);
 router.post("/fail", PaymentController.failPayment);
 router.post("/cancel", PaymentController.cancelPayment);
 
-router.post("/init-payment/:trackingId", PaymentController.nextTimePayment);
-
-router.post("/init-payment-receiver/:trackingId", authorize(Role.receiver), PaymentController.nextTimePaymentReceiver);
+router.post("/init-payment/:trackingId",authorize(...Object.values(Role)), PaymentController.nextTimePayment);
 
 
 router.post("/validate-payment", PaymentController.validatePayment);
