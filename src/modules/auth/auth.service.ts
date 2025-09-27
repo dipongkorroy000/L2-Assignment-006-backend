@@ -3,7 +3,7 @@ import httpStatus from "http-status-codes";
 import CustomError from "../../errorHelper/CustomError";
 import bcrypt from "bcryptjs";
 import { User } from "../user/user.model";
-import { createUserTokens } from "../../utils/generateToken";
+import { createNewAccessTokenWithRefreshToken, createUserTokens } from "../../utils/generateToken";
 import { IUser } from "../user/user.interface";
 import { setAuthCookie } from "../../utils/setCookie";
 import { Response } from "express";
@@ -28,4 +28,11 @@ const credentialLogin = async (payload: Partial<IUser>, res: Response) => {
   return { accessToken: userTokens.accessToken, refreshToken: userTokens.refreshToken, user: rest };
 };
 
-export const AuthService = { credentialLogin };
+const getNewAccessToken = async (refreshToken: string) => {
+    const newAccessToken = await createNewAccessTokenWithRefreshToken(refreshToken)
+
+    return {accessToken: newAccessToken}
+
+}
+
+export const AuthService = { credentialLogin, getNewAccessToken };
