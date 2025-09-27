@@ -2,6 +2,8 @@
 
 A secure and scalable parcel delivery backend built with **Express**, **TypeScript**, and **MongoDB**. Inspired by services like Pathao Courier and Sundarban, this system supports role-based access for `admin`, `sender`, and `receiver`, with full parcel tracking and status history.
 
+- **Backend**: [https://l2-assignment-006-backend.vercel.app](https://l2-assignment-006-backend.vercel.app)
+
 ---
 
 ## 🚀 Tech Stack
