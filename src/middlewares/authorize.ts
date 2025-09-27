@@ -20,11 +20,13 @@ export const authorize =
       const isUserExist = await User.findOne({ email: verifiedToken.email });
       if (!isUserExist) throw new CustomError(httpStatus.BAD_REQUEST, "Token unvalid");
 
+      
       if (isUserExist.isActive === IsActive.blocked || isUserExist.isActive === IsActive.inActive) {
         throw new CustomError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`);
       }
-
+      
       if (isUserExist.isDeleted) throw new CustomError(httpStatus.BAD_REQUEST, "User is Deleted");
+      
 
       if (!authRoles.includes(verifiedToken.role))
         throw new CustomError(httpStatus.METHOD_NOT_ALLOWED, "Your are not permitted to parcel send request");

@@ -43,8 +43,9 @@ const myParcels = catchAsync(async (req: Request, res: Response) => {
 });
 
 const receiverIncomingParcel = catchAsync(async (req: Request, res: Response) => {
-  const token = req.token;
-  const user = await User.findOne({ email: token.email });
+  const token = await req.token;
+  const user = await User.findById(token.userId);
+
   if (!user) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
   if (token.userId.toString() !== user._id.toString()) throw new CustomError(statusCode.NOT_FOUND, "Not authorized");
 
