@@ -11,7 +11,6 @@ router.post("/cancel", PaymentController.cancelPayment);
 
 router.post("/init-payment/:trackingId",authorize(...Object.values(Role)), PaymentController.nextTimePayment);
 
-
 router.post("/validate-payment", PaymentController.validatePayment);
 
 router.get("/all-payments", authorize(Role.admin, Role.super_admin), PaymentController.getPayments);
