@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 // getting-started.js
 import mongoose from "mongoose";
-import { envVars } from "./config/env";
+import {envVars} from "./config/env";
 import app from "./app";
-import { Server } from "http";
-import { connectRedis } from "./config/redis.config";
-import { superAdmin } from "./utils/superAdmin";
+import {Server} from "http";
+import {connectRedis} from "./config/redis.config";
+import {superAdmin} from "./utils/superAdmin";
 
 let server: Server;
 

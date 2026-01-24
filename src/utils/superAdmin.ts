@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import bcryptjs from "bcryptjs";
-import { envVars } from "../config/env";
-import { IAuthProvider, IUser, Role } from "../modules/user/user.interface";
-import { User } from "../modules/user/user.model";
+import {envVars} from "../config/env";
+import {IAuthProvider, IUser, Role} from "../modules/user/user.interface";
+import {User} from "../modules/user/user.model";
 
 export const superAdmin = async () => {
   try {
-    const isSuperAdminExist = await User.findOne({ email: envVars.SUPER_ADMIN_EMAIL });
+    const isSuperAdminExist = await User.findOne({email: envVars.SUPER_ADMIN_EMAIL});
 
     if (isSuperAdminExist) {
       console.log("Super Admin Already Exists!");
@@ -28,9 +30,9 @@ export const superAdmin = async () => {
       isVerified: true,
     };
 
-    const superAdmin = await User.create(payload);
-    console.log("Super Admin Created Successfuly! \n", superAdmin);
-  } catch (error) {
+    await User.create(payload);
+    console.log("Super Admin Created Successfully!");
+  } catch (error: any) {
     console.log(error);
   }
 };
