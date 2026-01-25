@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { ISSLCommerz } from "./sslCommerz.interface";
+import {ISSLCommerz} from "./sslCommerz.interface";
 import httpStatus from "http-status-codes";
 import CustomError from "../errorHelper/CustomError";
-import { envVars } from "../config/env";
-import { Payment } from "../payment/payment.model";
+import {envVars} from "../config/env";
+import {Payment} from "../payment/payment.model";
+import qs from "qs";
 
 const sslPaymentInit = async (payload: ISSLCommerz) => {
   try {
@@ -22,7 +23,7 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
       ipn_url: envVars.SSL.SSL_IPN_URL,
 
       shipping_method: "N/A",
-      product_name: "Tour",
+      product_name: "Parcel One",
       product_category: "Service",
       product_profile: "general",
 
@@ -46,15 +47,24 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
       ship_country: "N/A",
     };
 
-    const response = await axios({
-      method: "POST",
-      url: envVars.SSL.SSL_PAYMENT_API,
-      data: data,
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    // console.log("data", data);
+
+    const response = await axios.post(envVars.SSL.SSL_PAYMENT_API, qs.stringify(data, {encode: true}), {
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
     });
+
+    // console.log("response", response.data);
+
+
+    // const response = await axios.post("https://sandbox.sslcommerz.com/gwprocess/v4/api.php", qs.stringify(data), {
+    //   headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    // });
+
+    // console.log("SSLCommerz response:", response.data);
 
     return response.data;
   } catch (error: any) {
+    console.error("SSLCommerz error:", error.response?.data || error.message);
     throw new CustomError(httpStatus.BAD_REQUEST, error.message);
   }
 };
@@ -72,10 +82,10 @@ const validatePayment = async (payload: any) => {
     const responseData = await (await response).data;
 
     // console.log("sslcomeerz validate api response data", responseData);
-    await Payment.updateOne({ transactionId: payload.tran_id }, { paymentGatewayData: responseData }, { runValidators: true });
+    await Payment.updateOne({transactionId: payload.tran_id}, {paymentGatewayData: responseData}, {runValidators: true});
   } catch (error: any) {
     throw new CustomError(401, `Payment Validation Error, ${error.message}`);
   }
 };
 
-export const SSLService = { sslPaymentInit, validatePayment };
+export const SSLService = {sslPaymentInit, validatePayment};

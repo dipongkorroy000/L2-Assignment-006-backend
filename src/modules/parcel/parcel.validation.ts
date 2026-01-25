@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { Payment_Status, Status } from "./parcel.interface";
+import {z} from "zod";
+import {Payment_Status, Status} from "./parcel.interface";
 
 export const createParcelSchema = z.object({
   senderId: z.string().min(1, "Sender ID is required"),
@@ -9,6 +9,7 @@ export const createParcelSchema = z.object({
   trackingId: z.string().optional(),
   division: z.string().min(1, "Division is required"),
   city: z.string().min(1, "City is required"),
+  upazila: z.string(),
   area: z.string().min(1, "Area is required"),
   status: z.enum([Status.requested]).optional(),
   payment: z.enum([Payment_Status.PENDING]).optional(),

@@ -23,6 +23,7 @@ const parcelSchema = new Schema<IParcel>(
     trackingId: { type: String, required: true, unique: true },
     division: { type: String, required: [true, "Please provide division"] },
     city: { type: String, required: [true, "Please provide city"] },
+    upazila: {type: String, required: [true, "Please provide upazila"]},
     area: { type: String, required: [true, "Please provide area"] },
     status: { type: String, enum: Object.values(Status), default: Status.requested },
     payment: { type: String, enum: Object.values(Payment_Status), default: Payment_Status.PENDING },

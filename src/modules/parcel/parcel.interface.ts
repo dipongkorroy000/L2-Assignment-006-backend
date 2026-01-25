@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import {Types} from "mongoose";
 
 export enum Status {
   requested = "REQUESTED",
@@ -49,6 +49,7 @@ export interface IParcel {
   trackingId: string;
   division: string;
   city: string;
+  upazila: string;
   area: string;
   receiverEmail?: string;
   receiverNumber: string;
