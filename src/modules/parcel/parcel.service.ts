@@ -102,10 +102,17 @@ const myParcels = async (userId: string) => {
 };
 
 const receiverIncomingParcel = async (receiverEmail: string) => {
-  const parcels = await Parcel.find({receiverEmail}).select("-senderId").populate({
-    path: "senderId",
-    select: "-password -auths -_id -isActive -role -updatedAt -idDeleted -isVerified -createdAt",
-  });
+  const receiver = await User.findOne({email: receiverEmail});
+
+  const parcels = await Parcel.find({
+    $or: [{receiverEmail}, {receiverNumber: receiver?.phone}],
+  })
+    .select("trackingId title status payment createdAt receiverEmail type statusLog receiverNumber")
+    .populate({
+      path: "senderId",
+      select: "name email contactNumber", // sender এর basic info
+    });
+
   return parcels;
 };
 
@@ -119,7 +126,7 @@ const confirmParcel = async (trackingId: string, phone: string | undefined, emai
   if (!parcel) throw new CustomError(401, "Parcel not found");
   if (parcel.payment !== Payment_Status.COMPLETE) throw new CustomError(status.BAD_REQUEST, "Please pay your product delivery charge");
 
-  if (email && parcel.receiverEmail) {
+  if (email && parcel.receiverEmail || email && parcel.receiverNumber) {
     const receiver = await User.findOne({email});
     if (!receiver) throw new CustomError(401, "Receiver not found");
 
@@ -131,13 +138,14 @@ const confirmParcel = async (trackingId: string, phone: string | undefined, emai
     if (!receiver.isVerified) throw new CustomError(401, "please verify your profile");
     if (!receiver.phone) throw new CustomError(401, "Please update your profile , must be add phone number");
 
-    if (receiver.email !== parcel.receiverEmail) throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valied this receiver");
+    if (parcel.receiverEmail && receiver.email !== parcel.receiverEmail) throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valid this receiver");
+    if (parcel.receiverNumber && receiver.phone !== parcel.receiverNumber) throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valid this receiver");
 
     const result = await Parcel.updateOne({trackingId}, {status: Status.picked});
 
     return result;
   } else if (phone && parcel.receiverNumber) {
-    if (phone !== parcel.receiverNumber) throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valied this receiver");
+    if (phone !== parcel.receiverNumber) throw new CustomError(status.NOT_ACCEPTABLE, "Parcel not valid this receiver");
 
     const result = await Parcel.updateOne({trackingId}, {status: Status.picked});
 
