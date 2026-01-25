@@ -9,4 +9,6 @@ router.get("/user", authorize(Role.admin, Role.super_admin), StatsController.get
 router.get("/parcel", authorize(Role.admin, Role.super_admin), StatsController.getParcelStats);
 router.get("/payment", authorize(Role.admin, Role.super_admin), StatsController.getPaymentStats);
 
+router.get("/sender", authorize(Role.sender), StatsController.getSenderStats);
+
 export const StatsRoute = router;

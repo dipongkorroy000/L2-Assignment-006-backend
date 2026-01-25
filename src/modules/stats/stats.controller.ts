@@ -1,8 +1,8 @@
 // controllers/stats.controller.ts
-import { Request, Response } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { StatsService } from "./stats.service";
+import {Request, Response} from "express";
+import {catchAsync} from "../../utils/catchAsync";
+import {sendResponse} from "../../utils/sendResponse";
+import {StatsService} from "./stats.service";
 
 const getPaymentStats = catchAsync(async (req: Request, res: Response) => {
   const stats = await StatsService.getPaymentStats();
@@ -34,4 +34,14 @@ const getUserStats = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const StatsController = { getUserStats, getParcelStats, getPaymentStats };
+const getSenderStats = catchAsync(async (req: Request, res: Response) => {
+  const stats = await StatsService.getSenderStats(req.token.email as string);
+  sendResponse(res, {
+    status: 200,
+    success: true,
+    message: "User stats fetched successfully",
+    data: stats,
+  });
+});
+
+export const StatsController = {getUserStats, getParcelStats, getPaymentStats, getSenderStats};
